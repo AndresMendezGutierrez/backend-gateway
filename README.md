@@ -49,3 +49,48 @@ We utilize **Google Cloud Secret Manager** via Firebase CLI. To set up the requi
 ```bash
 firebase functions:secrets:set RECAPTCHA_SECRET_KEY
 ```
+
+## CORS Policy
+
+Cross-Origin Resource Sharing is strictly enforced. Authorized domains are white-listed within the function configuration to prevent unauthorized API usage.
+
+## Technical Setup
+
+### Prerequisites
+
+Node.js (v18 or higher)
+
+Firebase CLI (npm install -g firebase-tools)
+
+Firebase Blaze Plan (Required for outbound networking to Google APIs)
+
+Installation & Deployment
+Clone the repository.
+
+Install dependencies:
+
+```bash
+cd functions && npm install
+```
+
+Deploy to production:
+
+```bash
+firebase deploy --only functions
+```
+
+📂 Project Structure
+
+```bash
+/functions
+├── /src
+│   ├── index.ts          # API Triggers and CORS configuration
+│   └── utils/            # Modular helper functions (DRY principle)
+├── package.json          # Backend dependencies
+└── tsconfig.json         # TypeScript compiler settings
+```
+
+📝 Monitoring & Maintenance
+Logging: Execution logs and error tracking are handled via Google Cloud Logs Explorer.
+
+Scalability: Configured with maxInstances: 10 to balance performance and cost-efficiency.
