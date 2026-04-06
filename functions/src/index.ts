@@ -6,7 +6,7 @@ setGlobalOptions({ maxInstances: 10 });
 
 export const validateRecaptcha = onRequest(
   {
-    cors: ["http://localhost:4321"],
+    cors: ["http://localhost:4321", "https://andresmendezgutierrez.github.io"],
     secrets: ["RECAPTCHA_SECRET_KEY"],
   },
   async (req, res) => {
