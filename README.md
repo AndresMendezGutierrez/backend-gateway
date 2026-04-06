@@ -1,96 +1,106 @@
-# Backend Gateway (Firebase Cloud Functions)
+# 🛡️ Backend Gateway (Firebase Cloud Functions)
 
-A secure, serverless backend gateway designed to handle sensitive logic and third-party API integrations for static frontends. This architecture ensures that private API keys and business logic remain protected from the client side.
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
-![serverless architecture image](assets/serverless-architecture.webp)
-
-## Architecture Overview
-
-This project serves as the bridge between a **static frontend (Astro/GitHub Pages)** and private services. By moving sensitive operations (like reCAPTCHA verification) to this gateway, we eliminate the risk of exposing provider secrets in the browser.
-
-- **Frontend**: Hosted on GitHub Pages (Static).
-- **Backend**: Firebase Cloud Functions (Node.js/TypeScript).
-- **Communication**: Secure HTTPS requests with restricted CORS.
+Middleware seguro y _serverless_ diseñado para manejar lógica sensible e integraciones de APIs de terceros. Esta arquitectura actúa como un puente (Gateway) que protege las claves privadas y la lógica de negocio, manteniéndolas fuera del alcance del cliente (navegador).
 
 ---
 
-## Core API Endpoints
+## 🏗️ Resumen de Arquitectura
+
+Este proyecto resuelve el problema de seguridad en **frontends estáticos (Astro/GitHub Pages)**. Al delegar operaciones sensibles como la verificación de reCAPTCHA a este Gateway, eliminamos el riesgo de exponer _Provider Secrets_.
+
+- **Frontend:** Astro (SSG) alojado en GitHub Pages.
+- **Backend:** Firebase Cloud Functions (Runtime: Node.js 20+).
+- **Seguridad:** Comunicación HTTPS cifrada con políticas de CORS restrictivas.
+
+---
+
+## 🛠️ Core API Endpoints
 
 ### 1. `validateRecaptcha`
 
-Integrates with **Google reCAPTCHA v3** to analyze user behavior and assign a bot-likelihood score.
+Analiza el comportamiento del usuario mediante **Google reCAPTCHA v3** y asigna una puntuación de legitimidad.
 
-- **Endpoint:** `https://<REGION>-<PROJECT_ID>.cloudfunctions.net/validateRecaptcha`
-- **Method:** `POST`
-- **Security:** \* **CORS Protection**: Access is restricted to authorized origins only.
-  - **Secret Manager**: The reCAPTCHA Private Key is injected at runtime via Firebase Secrets.
-- **Request Schema:**
-  ```json
-  { "token": "string" }
-  ```
-- **Response Schema:**
-  ```json
-  {
-    "isValid": "boolean",
-    "score": "number (0.0 - 1.0)"
-  }
-  ```
+- **Método:** `POST`
+- **Seguridad:** - **CORS Protection:** Acceso restringido exclusivamente a dominios autorizados.
+  - **Secret Manager:** La clave privada de reCAPTCHA se inyecta en tiempo de ejecución mediante _Firebase Secrets_.
+- **Payload:** `{ "token": "string" }`
+- **Response:** `{ "success": boolean, "score": number }`
 
 ---
 
-## Security & Environment
+## 🔒 Seguridad y Entorno
 
-This repository follows industry standards for security. **No sensitive credentials (API Keys, Secrets) are stored in this codebase.**
+Este repositorio sigue los estándares de la industria (OWASP). **Ninguna credencial sensible (API Keys, Tokens) se almacena en el código base.**
 
-### Secret Management
+### Gestión de Secretos
 
-We utilize **Google Cloud Secret Manager** via Firebase CLI. To set up the required environment, use:
+Utilizamos **Google Cloud Secret Manager** a través de la CLI de Firebase. Para configurar el entorno:
 
 ```bash
 firebase functions:secrets:set RECAPTCHA_SECRET_KEY
 ```
 
-## CORS Policy
+### Política de CORS
 
-Cross-Origin Resource Sharing is strictly enforced. Authorized domains are white-listed within the function configuration to prevent unauthorized API usage.
+El Cross-Origin Resource Sharing está estrictamente configurado. Solo los dominios en la lista blanca (whitelist) pueden consumir estos recursos, previniendo ataques de Cross-Site Request Forgery (CSRF).
 
-## Technical Setup
+## 🚀 Instalación y Despliegue
 
-### Prerequisites
+### Requisitos Previos
 
-Node.js (v18 or higher)
+- Node.js v18+
+- Firebase CLI (npm install -g firebase-tools)
+- Plan Firebase Blaze (Necesario para peticiones salientes a APIs externas).
 
-Firebase CLI (npm install -g firebase-tools)
+### Pasos de Despliegue
 
-Firebase Blaze Plan (Required for outbound networking to Google APIs)
+##### Clonar e instalar:
 
-Installation & Deployment
-Clone the repository.
-
-Install dependencies:
-
-```bash
+```Bash
 cd functions && npm install
 ```
 
-Deploy to production:
+#### Login y Selección de Proyecto:
 
-```bash
+```Bash
+firebase login
+firebase use --add [PROJECT_ID]
+```
+
+#### Desplegar a Producción:
+
+```Bash
 firebase deploy --only functions
 ```
 
-📂 Project Structure
+## 📂 Estructura del Proyecto
 
-```bash
+```
 /functions
-├── /src
-│   ├── index.ts          # API Triggers and CORS configuration
-│   └── utils/            # Modular helper functions (DRY principle)
-├── package.json          # Backend dependencies
-└── tsconfig.json         # TypeScript compiler settings
+├── src/
+│   ├── index.ts        # Entry point, triggers y configuración de CORS
+│   ├── services/       # Lógica de integración (Mail, Recaptcha)
+│   └── utils/          # Helpers modulares (Principio DRY)
+├── .eslintrc.js        # Reglas de calidad de código
+├── package.json        # Dependencias del backend
+└── tsconfig.json       # Configuración de TypeScript (ES2022)
 ```
 
-📝 Monitoring & Maintenance
-Logging: Execution logs and error tracking are handled via Google Cloud Logs Explorer.
+## 📈 Monitoreo y Mantenimiento
 
-Scalability: Configured with maxInstances: 10 to balance performance and cost-efficiency.
+- **Logging**: Trazabilidad completa de ejecuciones mediante Google Cloud Logs Explorer.
+
+- **Escalabilidad**: Configurado con maxInstances: 10 para balancear rendimiento y eficiencia de costes.
+
+- **Cold Starts**: Optimizado mediante la carga modular de dependencias.
+
+## 📩 Contacto
+
+Desarrollado por **Andrés Méndez**.
+
+Enfocado en la creación de arquitecturas seguras y escalables.
